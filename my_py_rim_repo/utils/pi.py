@@ -1,4 +1,4 @@
-# pyexample/utils/pi.py
+# my_py_rim_repo/utils/pi.py
 import math
 
 
