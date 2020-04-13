@@ -1,0 +1,47 @@
+# .circleci/config.yml
+defaults: &defaults
+  docker:
+    - image: continuumio/miniconda3:latest
+  working_directory: ~/repo
+
+version: 2
+jobs:
+
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Install Python
+          command: conda install python=3.6
+      - run:
+          name: Create package distribution
+          command: python setup.py sdist
+      - persist_to_workspace:
+          root: dist
+          paths:
+            - .
+
+  pypi:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: dist
+      - run:
+          name: Upload package
+          command: build-scripts/upload-project.sh
+
+workflows:
+  version: 2
+  build-pypi:
+    jobs:
+      - build
+      - pypi:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
+
